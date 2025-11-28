@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/
+*.log
+.DS_Store
+
+# Environment variables
+.env
+.env.local
+.env.production
+Nexus-backend/.env
+nexus-frontend/.env
