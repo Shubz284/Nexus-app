@@ -10,3 +10,4 @@ build/
 .env.production
 Nexus-backend/.env
 nexus-frontend/.env
+PROJECT_ANALYSIS.md
