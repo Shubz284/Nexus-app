@@ -129,24 +129,15 @@ const ContentModal = ({ open, onClose }: ContentModalProps) => {
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={(e) => {
-                  console.log("Key pressed:", e.key);
                   if (e.key === "Enter" || e.key === "," || e.key === " ") {
                     e.preventDefault();
                     let raw = tagInput.trim();
-                    console.log("Raw tag input:", raw);
                     // Remove # if user typed it
                     if (raw.startsWith("#")) {
                       raw = raw.substring(1).trim();
                     }
                     if (raw && !tags.includes(raw)) {
-                      console.log("Adding tag:", raw);
-                      setTags((prev) => {
-                        const newTags = [...prev, raw];
-                        console.log("New tags array:", newTags);
-                        return newTags;
-                      });
-                    } else {
-                      console.log("Tag already exists or empty:", raw);
+                      setTags((prev) => [...prev, raw]);
                     }
                     setTagInput("");
                   }

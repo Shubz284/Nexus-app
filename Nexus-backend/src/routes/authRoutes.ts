@@ -6,6 +6,9 @@ import bcrypt from "bcrypt";
 import { asyncWrap } from "../utils/asyncWrap";
 import jwt from "jsonwebtoken";
 import passport from "passport";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 
 import dotenv from "dotenv";
 import refreshMiddleware from "../middlewares/refreshMiddleware";
@@ -87,7 +90,7 @@ authRouter.post(
       success: true,
       message: "Account created successfully.",
     });
-  })
+  }),
 );
 
 authRouter.post(
@@ -115,8 +118,8 @@ authRouter.post(
       });
     }
 
-    // @ts-ignore
-    const isMatch = await bcrypt.compare(password, foundUser.password);
+    // Type assertion: foundUser.password exists because local auth requires it
+    const isMatch = await bcrypt.compare(password, (foundUser as any).password);
 
     if (!isMatch) {
       return res.status(401).json({
@@ -160,7 +163,7 @@ authRouter.post(
     });
 
     res.status(200).json({ message: "Logged in", success: true });
-  })
+  }),
 );
 
 //refresh_token
@@ -185,7 +188,7 @@ authRouter.get(
       process.env.ACCESS_KEY,
       {
         expiresIn: "1h",
-      }
+      },
     );
 
     return res
@@ -197,12 +200,12 @@ authRouter.get(
         maxAge: 60 * 60 * 1000,
       })
       .json({ success: true, message: "Token refreshed successfully." });
-  })
+  }),
 );
 
 authRouter.get(
   "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
+  passport.authenticate("google", { scope: ["profile", "email"] }),
 );
 
 authRouter.get("/google/callback", (req, res, next) => {
@@ -217,14 +220,14 @@ authRouter.get("/google/callback", (req, res, next) => {
       // 2. Handle custom "email exists" failure
       if (info && info.message === "email_exists") {
         return res.redirect(
-          `${process.env.FRONTEND_URI}/auth/login?error=email_exists`
+          `${process.env.FRONTEND_URI}/auth/login?error=email_exists`,
         );
       }
 
       // 3. Handle generic failures
       if (!user) {
         return res.redirect(
-          `${process.env.UI_URL}/auth/login?error=auth_failed`
+          `${process.env.FRONTEND_URI}/auth/login?error=auth_failed`,
         );
       }
 
@@ -237,7 +240,7 @@ authRouter.get("/google/callback", (req, res, next) => {
           process.env.ACCESS_KEY!,
           {
             expiresIn: "7d",
-          }
+          },
         );
 
         // Use user._id instead of req.user._id
@@ -246,7 +249,7 @@ authRouter.get("/google/callback", (req, res, next) => {
           process.env.REFRESH_KEY!,
           {
             expiresIn: "15d",
-          }
+          },
         );
 
         res.cookie("accessToken", accessToken, {
@@ -267,7 +270,7 @@ authRouter.get("/google/callback", (req, res, next) => {
       } catch (tokenError) {
         return next(tokenError);
       }
-    }
+    },
   );
   googleAuth(req, res, next);
 });
@@ -280,7 +283,7 @@ authRouter.get(
     res.status(200).json({
       user: req.user,
     });
-  })
+  }),
 );
 
 //logout
@@ -304,7 +307,7 @@ authRouter.post(
       success: true,
       message: "Logged Out Successfully",
     });
-  })
+  }),
 );
 
 const protect = passport.authenticate("jwt-access", { session: false });
@@ -318,9 +321,6 @@ authRouter.post(
     if (!title || !link) {
       return res.status(400).json({ msg: "Title and link are required" });
     }
-
-    // Debug: log incoming tags to help trace why tags may be missing
-    console.log("[POST /auth/content] incoming tags:", tags);
 
     // Accept tags sent as a comma-separated string as well as an array
     if (typeof tags === "string") {
@@ -345,7 +345,6 @@ authRouter.post(
       });
 
       tagIds = await Promise.all(tagPromises);
-      console.log("[POST /auth/content] resolved tagIds:", tagIds);
     }
 
     const newContent = await ContentModel.create({
@@ -356,12 +355,8 @@ authRouter.post(
       tags: tagIds,
     });
 
-    console.log(
-      "[POST /auth/content] Created content with tags:",
-      newContent.tags
-    );
     res.json({ msg: "Content added", tags: tagIds });
-  })
+  }),
 );
 
 authRouter.get(
@@ -378,7 +373,7 @@ authRouter.get(
     res.json({
       content,
     });
-  })
+  }),
 );
 
 authRouter.delete(
@@ -399,7 +394,7 @@ authRouter.delete(
     res.json({
       msg: "content deleted",
     });
-  })
+  }),
 );
 
 authRouter.post(
@@ -434,7 +429,7 @@ authRouter.post(
         msg: "Removed the link",
       });
     }
-  })
+  }),
 );
 
 authRouter.get(
@@ -457,9 +452,11 @@ authRouter.get(
 
     const content = await ContentModel.find({
       userId: link.userId,
-    });
+    })
+      .populate("userId", "username")
+      .populate("tags", "title");
 
-    const user = await userModel.find({
+    const user = await userModel.findOne({
       _id: link.userId,
     });
 
@@ -471,11 +468,10 @@ authRouter.get(
     }
 
     res.json({
-      // @ts-ignore
-      userName: user?.userName,
+      userName: user.userName,
       content: content,
     });
-  })
+  }),
 );
 
 // Lightweight preview endpoint to extract Open Graph metadata (og:image, og:title, og:description)
@@ -528,14 +524,14 @@ authRouter.get(
           // property="og:..." with content first or second
           const reProp1 = new RegExp(
             `<meta[^>]+property=[\"']${prop}[\"'][^>]*content=[\"']([^\"']+)[\"'][^>]*>`,
-            "i"
+            "i",
           );
           const m1 = text.match(reProp1);
           if (m1 && m1[1]) return m1[1];
 
           const reProp2 = new RegExp(
             `<meta[^>]+content=[\"']([^\"']+)[\"'][^>]*property=[\"']${prop}[\"'][^>]*>`,
-            "i"
+            "i",
           );
           const m2 = text.match(reProp2);
           if (m2 && m2[1]) return m2[1];
@@ -543,7 +539,7 @@ authRouter.get(
           // name="twitter:..." or name="..."
           const reName = new RegExp(
             `<meta[^>]+name=[\"']${prop}[\"'][^>]*content=[\"']([^\"']+)[\"'][^>]*>`,
-            "i"
+            "i",
           );
           const m3 = text.match(reName);
           if (m3 && m3[1]) return m3[1];
@@ -565,7 +561,7 @@ authRouter.get(
         .status(500)
         .json({ success: false, message: "failed to fetch preview" });
     }
-  })
+  }),
 );
 
 export default authRouter;

@@ -1,4 +1,4 @@
-import mongoose, {Document}from "mongoose";
+import mongoose, { Document } from "mongoose";
 import findOrCreate from "mongoose-findorcreate";
 
 interface IUser extends Document {
@@ -27,33 +27,36 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: function (this:IUser) {
+      required: function (this: IUser) {
         // Required if user signs up via local (email/password)
         return this.authProvider === "local";
       },
     },
     googleId: {
       type: String,
-      required: function (this:IUser) {
+      required: function (this: IUser) {
         return this.authProvider === "google";
       },
       unique: true,
       sparse: true, // Allows multiple nulls, only unique if present
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-const ContentSchema = new mongoose. Schema({
+const ContentSchema = new mongoose.Schema({
   title: { type: String, require: true },
   link: String,
   // type: { type: String, enum: contentTypes, required: true },
   tags: [{ type: mongoose.Types.ObjectId, ref: "Tag" }],
   type: String,
+  fileName: String,
+  fileMimeType: String,
+  fileSize: Number,
   userId: { type: mongoose.Types.ObjectId, ref: "User", required: true },
 });
 
-const LinkSchema = new mongoose. Schema({
+const LinkSchema = new mongoose.Schema({
   hash: { type: String, required: true },
   userId: {
     type: mongoose.Types.ObjectId,
@@ -63,16 +66,15 @@ const LinkSchema = new mongoose. Schema({
   },
 });
 
-const TagSchema = new mongoose. Schema({
+const TagSchema = new mongoose.Schema({
   title: { type: String, required: true, unique: true },
 });
-
 
 userSchema.plugin(findOrCreate);
 
 const userModel = mongoose.model<IUser>("User", userSchema);
 export const LinkModel = mongoose.model("Links", LinkSchema);
-export const TagModel = mongoose.model("Tag", TagSchema)
+export const TagModel = mongoose.model("Tag", TagSchema);
 export const ContentModel = mongoose.model("Content", ContentSchema);
 
 export { userModel, IUser };

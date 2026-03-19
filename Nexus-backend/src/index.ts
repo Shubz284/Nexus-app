@@ -4,6 +4,7 @@ import authRouter from "./routes/authRoutes.js";
 import mongoose from "mongoose";
 import session from "express-session";
 import errorHandler from "./middlewares/errorHandler.js";
+import path from "path";
 
 import cookieParser from "cookie-parser";
 import passport from "passport";
@@ -12,17 +13,55 @@ import "./config/passport.js";
 import dotenv from "dotenv";
 dotenv.config();
 
+const requiredEnvVars = [
+  "MONGO_URI",
+  "PORT",
+  "SESSION_SECRET",
+  "ACCESS_KEY",
+  "REFRESH_KEY",
+  "GOOGLE_CLIENT_ID",
+  "GOOGLE_CLIENT_SECRET",
+  "GOOGLE_REDIRECT_URI",
+  "FRONTEND_URI",
+];
+
+const missingEnvVars = requiredEnvVars.filter((key) => !process.env[key]);
+if (missingEnvVars.length > 0) {
+  throw new Error(
+    `Missing required environment variables: ${missingEnvVars.join(", ")}`,
+  );
+}
+
 // --- Standard Middleware ---
 const app = express();
+
+const allowedOrigins = [
+  process.env.FRONTEND_URI,
+  process.env.EXTENSION_ORIGIN,
+].filter((origin): origin is string => Boolean(origin));
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URI,
+    origin: (origin, callback) => {
+      // Allow non-browser requests (no origin) and configured app/extension origins.
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      // Allow unpacked Chrome extension during local development.
+      if (origin.startsWith("chrome-extension://")) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
-  })
+  }),
 );
 
 app.use(express.json());
 app.use(cookieParser());
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 const sessionSecret = process.env.SESSION_SECRET;
 if (!sessionSecret)
@@ -49,7 +88,7 @@ app.use(
       secure: process.env.NODE_ENV === "production", // Only send cookie over HTTPS. Set to true in production.
       maxAge: 1000 * 60 * 5, // 5 minutes
     },
-  })
+  }),
 );
 
 // --- Passport Middleware ---

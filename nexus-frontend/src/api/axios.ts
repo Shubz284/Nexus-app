@@ -1,12 +1,11 @@
 import axios from "axios";
 import { toast } from "sonner";
-
-
+import { SERVER_URL } from "@/config/env";
 
 // Get the server URL from environment variables
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = SERVER_URL;
 
-// This creates a centralized HTTP client that automatically handles 
+// This creates a centralized HTTP client that automatically handles
 // authentication errors and provides consistent error handling across your app.
 
 const axiosInstance = axios.create({
@@ -58,8 +57,9 @@ export async function getUser() {
     const { data } = await axiosInstance.get("/auth/user");
     return data.user;
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-    console.error("getUser error:",errorMessage );
+    const errorMessage =
+      error instanceof Error ? error.message : "An unknown error occurred";
+    console.error("getUser error:", errorMessage);
     throw error;
   }
 }

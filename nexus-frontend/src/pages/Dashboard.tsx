@@ -8,6 +8,7 @@ import { useEffect, useState, useMemo } from "react";
 import AppSidebar from "../components_Custom/AppSidebar";
 import useContent from "../hooks/useContent";
 import axiosInstance from "@/api/axios";
+import { APP_URL } from "@/config/env";
 import SearchBar from "../components_Custom/SearchBar";
 import { toast } from "sonner";
 import UserProfile from "../components_Custom/UserProfile";
@@ -56,9 +57,9 @@ const Dashboard = () => {
     const response = await axiosInstance.post(`/auth/brain/share`, {
       share: true,
     });
-    const shareUrl = `http://localhost:5173/share/${response.data.hash}`;
+    const shareUrl = `${APP_URL}/share/${response.data.hash}`;
     await navigator.clipboard.writeText(shareUrl);
-    alert(`Link copied to clipboard:${shareUrl}`);
+    toast.success("Link is copied to clipbard");
   };
 
   const handleDeleteContent = async (contentId: string) => {

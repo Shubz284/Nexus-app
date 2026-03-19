@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nexus Quick Save</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="popup">
+      <div class="glow glow-top"></div>
+      <div class="glow glow-bottom"></div>
+
+      <header class="header">
+        <div class="logo">N</div>
+        <div class="title-wrap">
+          <p class="eyebrow">Nexus Extension</p>
+          <h1>Quick Save</h1>
+          <p class="subtitle">Save this page without leaving your tab.</p>
+        </div>
+      </header>
+
+      <form id="saveForm" class="form">
+        <label class="field">
+          <span>Title</span>
+          <input id="title" type="text" placeholder="Page title" required />
+        </label>
+
+        <label class="field">
+          <span>Link</span>
+          <input id="link" type="url" placeholder="https://..." required />
+        </label>
+
+        <label class="field">
+          <span>Content type</span>
+          <div class="type-shell">
+            <input id="type" type="text" readonly />
+            <span id="typeBadge" class="type-badge">Other</span>
+          </div>
+        </label>
+
+        <label class="field">
+          <span>Tags</span>
+          <input
+            id="tags"
+            type="text"
+            placeholder="ai, productivity, research"
+          />
+          <small>Use commas to separate tags</small>
+        </label>
+
+        <p id="status" class="status" aria-live="polite"></p>
+
+        <div class="actions">
+          <button id="saveBtn" type="submit">Save to Nexus</button>
+          <button id="openBtn" type="button" class="secondary">
+            Open Dashboard
+          </button>
+        </div>
+      </form>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

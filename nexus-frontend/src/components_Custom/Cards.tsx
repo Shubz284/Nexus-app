@@ -120,28 +120,28 @@ const Card = (props: CardProps) => {
                 {props.title}
               </div>
             </div>
-            <div className="ml-2 flex flex-shrink-0 items-center gap-2">
-              <button
-                onClick={handleShare}
-                className="rounded p-1.5 transition-colors hover:bg-gray-100"
-                aria-label="Share"
-              >
-                <Share2
-                  size={18}
-                  className="text-neutral-600 hover:text-neutral-900"
-                />
-              </button>
-              <button
-                onClick={handleDeleteClick}
-                className="rounded p-1.5 transition-colors hover:bg-red-50"
-                aria-label="Delete"
-              >
-                <Trash2
-                  size={18}
-                  className="text-neutral-600 hover:text-red-600"
-                />
-              </button>
-            </div>
+                <div className="ml-2 flex flex-shrink-0 items-center gap-2">
+                  <button
+                    onClick={handleShare}
+                    className="rounded p-1.5 transition-colors hover:bg-gray-100"
+                    aria-label="Share"
+                  >
+                    <Share2
+                      size={18}
+                      className="text-neutral-600 hover:text-neutral-900"
+                    />
+                  </button>
+                  <button
+                    onClick={handleDeleteClick}
+                    className="rounded p-1.5 transition-colors hover:bg-red-50"
+                    aria-label="Delete"
+                  >
+                    <Trash2
+                      size={18}
+                      className="text-neutral-600 hover:text-red-600"
+                    />
+                  </button>
+                </div>
           </div>
           <div className="mt-3 flex-1 overflow-hidden sm:mt-5">
             {props.type == "youtube" && (

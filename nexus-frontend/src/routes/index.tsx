@@ -1,7 +1,9 @@
 import NotFound from "@/pages/NotFound";
-import { createBrowserRouter, Navigate } from "react-router";
+import { createBrowserRouter } from "react-router";
 import { AuthRoutes } from "./AuthRoutes";
 import { appRoutes } from "./AppRoutes";
+import SharedBrain from "@/pages/SharedBrain";
+import LandingPage from "@/pages/LandingPage";
 
 export const router = createBrowserRouter([
   {
@@ -10,16 +12,20 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Navigate to="/auth/signup" replace />,
+        element: <LandingPage />,
       },
       {
         path: "auth",
         children: AuthRoutes,
       },
       {
-        path:"app",
-        children:appRoutes
-      }
+        path: "app",
+        children: appRoutes,
+      },
+      {
+        path: "share/:shareLink",
+        element: <SharedBrain />,
+      },
     ],
   },
 ]);
