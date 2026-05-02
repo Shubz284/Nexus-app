@@ -112,6 +112,11 @@ body {
   letter-spacing: -0.02em;
 }
 
+.header p{
+  font-size: medium;
+  font-weight: bold;
+}
+
 .subtitle {
   margin: 4px 0 0;
   font-size: 12px;

@@ -69,13 +69,13 @@ const LandingPage = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate("/auth/login")}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+              className="cursor-pointer rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
             >
               Sign In
             </button>
             <button
               onClick={() => navigate("/auth/signup")}
-              className="rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-2 text-sm font-semibold text-white shadow-lg transition-transform hover:scale-105"
+              className="cursor-pointer rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-2 text-sm font-semibold text-white shadow-lg transition-transform hover:scale-105"
             >
               Get Started
             </button>
@@ -115,14 +115,14 @@ const LandingPage = () => {
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <button
                 onClick={() => navigate("/auth/signup")}
-                className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 px-8 py-4 text-lg font-semibold text-white shadow-xl transition-all hover:scale-105 hover:shadow-2xl"
+                className="group inline-flex cursor-pointer items-center gap-2 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 px-8 py-4 text-lg font-semibold text-white shadow-xl transition-all hover:scale-105 hover:shadow-2xl"
               >
                 Start Building Free
                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               </button>
               <button
                 onClick={() => navigate("/auth/login")}
-                className="inline-flex items-center gap-2 rounded-full border-2 border-gray-300 bg-white px-8 py-4 text-lg font-semibold text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50"
+                className="inline-flex cursor-pointer items-center gap-2 rounded-full border-2 border-gray-300 bg-white px-8 py-4 text-lg font-semibold text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50"
               >
                 Sign In
               </button>
@@ -294,7 +294,7 @@ const LandingPage = () => {
                       collections. Inspire others with your knowledge and become
                       a thought leader.
                     </p>
-                    <button className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-semibold text-purple-600 transition-transform hover:scale-105">
+                    <button className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-semibold text-purple-600 transition-transform hover:scale-105" >
                       <Share2 className="h-5 w-5" />
                       Try Sharing Now
                     </button>
@@ -324,7 +324,7 @@ const LandingPage = () => {
           <div className="mb-16 text-center">
             <h2 className="mb-4 text-4xl font-extrabold text-gray-900 sm:text-5xl">
               Everything You Need to
-              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text pl-1 text-transparent">
                 Organize Knowledge
               </span>
             </h2>
@@ -469,7 +469,7 @@ const LandingPage = () => {
               <span className="text-xl font-bold text-gray-900">Nexus</span>
             </div>
             <p className="text-sm text-gray-500">
-              © 2026 Nexus. Built for knowledge seekers.
+              © 2026 Nexus. Built by cracked devs👾
             </p>
             <div className="flex items-center gap-6">
               <a

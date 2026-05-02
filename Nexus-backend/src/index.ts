@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import authRouter from "./routes/authRoutes.js";
+import notesRouter from "./routes/notesRoutes.js";
+import documentsRouter from "./routes/documentsRoutes.js";
 import mongoose from "mongoose";
 import session from "express-session";
 import errorHandler from "./middlewares/errorHandler.js";
@@ -61,6 +63,8 @@ app.use(
 
 app.use(express.json());
 app.use(cookieParser());
+
+// Serve uploads folder statically
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 const sessionSecret = process.env.SESSION_SECRET;
@@ -97,6 +101,8 @@ app.use(passport.session());
 
 // ----Routes---
 app.use("/auth", authRouter);
+app.use("/notes", notesRouter);
+app.use("/documents", documentsRouter);
 
 // error handler
 app.use(errorHandler);

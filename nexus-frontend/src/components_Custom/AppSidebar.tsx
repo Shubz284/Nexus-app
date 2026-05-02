@@ -1,9 +1,10 @@
-import { BrainIcon } from "lucide-react";
+import { BrainIcon, FileText, LogOut } from "lucide-react";
 import { X } from "lucide-react";
 import { TwitterIcon } from "../icons/TwitterIcon";
 import YoutubeIcon from "../icons/YoutubeIcon";
 import { InstagramIcon } from "../icons/InstagramIcon";
 import { FacebookIcon } from "../icons/FacebookIcon";
+import { useNavigate, useLocation } from "react-router";
 
 interface SidebarItemProps {
   text: string;
@@ -27,18 +28,24 @@ const SidebarItem = ({ text, icon, isActive, onClick }: SidebarItemProps) => {
 };
 
 interface AppSidebarProps {
-  activeFilter: string;
-  onFilterChange: (filter: string) => void;
+  activeFilter?: string;
+  onFilterChange?: (filter: string) => void;
   isOpen?: boolean;
   onClose?: () => void;
 }
 
 const AppSidebar = ({
-  activeFilter,
+  activeFilter = "all",
   onFilterChange,
   isOpen = false,
   onClose,
 }: AppSidebarProps) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const isDashboard = location.pathname.includes("/dashboard");
+  const isNotes = location.pathname.includes("/notes");
+
   return (
     <aside
       className={`fixed top-0 left-0 z-50 h-screen w-64 border-r border-gray-200 bg-white transition-transform duration-300 lg:translate-x-0 ${
@@ -64,54 +71,93 @@ const AppSidebar = ({
         </div>
       </div>
 
-      {/* Navigation */}
-      <nav className="space-y-1 p-4">
+      {/* Main Navigation */}
+      <nav className="border-b border-gray-200 p-4">
+        <div className="mb-2 text-xs font-semibold text-gray-500 uppercase">
+          Main
+        </div>
         <SidebarItem
-          text="All Content"
+          text="Brain"
           icon={<BrainIcon className="h-5 w-5" />}
-          isActive={activeFilter === "all"}
+          isActive={isDashboard}
           onClick={() => {
-            onFilterChange("all");
+            navigate("/app/dashboard");
             onClose?.();
           }}
         />
         <SidebarItem
-          text="Twitter"
-          icon={<TwitterIcon />}
-          isActive={activeFilter === "twitter"}
+          text="Notes"
+          icon={<FileText className="h-5 w-5" />}
+          isActive={isNotes}
           onClick={() => {
-            onFilterChange("twitter");
+            navigate("/app/notes");
             onClose?.();
           }}
         />
         <SidebarItem
-          text="YouTube"
-          icon={<YoutubeIcon />}
-          isActive={activeFilter === "youtube"}
+          text="Documents"
+          icon={<FileText className="h-5 w-5" />}
+          isActive={location.pathname === "/app/documents"}
           onClick={() => {
-            onFilterChange("youtube");
-            onClose?.();
-          }}
-        />
-        <SidebarItem
-          text="Instagram"
-          icon={<InstagramIcon />}
-          isActive={activeFilter === "instagram"}
-          onClick={() => {
-            onFilterChange("instagram");
-            onClose?.();
-          }}
-        />
-        <SidebarItem
-          text="Facebook"
-          icon={<FacebookIcon />}
-          isActive={activeFilter === "facebook"}
-          onClick={() => {
-            onFilterChange("facebook");
+            navigate("/app/documents");
             onClose?.();
           }}
         />
       </nav>
+
+      {/* Content Filters */}
+      {isDashboard && (
+        <nav className="space-y-1 p-4">
+          <div className="mb-2 text-xs font-semibold text-gray-500 uppercase">
+            Filter by Type
+          </div>
+          <SidebarItem
+            text="All Content"
+            icon={<BrainIcon className="h-5 w-5" />}
+            isActive={activeFilter === "all"}
+            onClick={() => {
+              onFilterChange?.("all");
+              onClose?.();
+            }}
+          />
+          <SidebarItem
+            text="Twitter"
+            icon={<TwitterIcon />}
+            isActive={activeFilter === "twitter"}
+            onClick={() => {
+              onFilterChange?.("twitter");
+              onClose?.();
+            }}
+          />
+          <SidebarItem
+            text="YouTube"
+            icon={<YoutubeIcon />}
+            isActive={activeFilter === "youtube"}
+            onClick={() => {
+              onFilterChange?.("youtube");
+              onClose?.();
+            }}
+          />
+          <SidebarItem
+            text="Instagram"
+            icon={<InstagramIcon />}
+            isActive={activeFilter === "instagram"}
+            onClick={() => {
+              onFilterChange?.("instagram");
+              onClose?.();
+            }}
+          />
+          <SidebarItem
+            text="Facebook"
+            icon={<FacebookIcon />}
+            isActive={activeFilter === "facebook"}
+            onClick={() => {
+              onFilterChange?.("facebook");
+              onClose?.();
+            }}
+          />
+        </nav>
+      )}
     </aside>
   );
 };

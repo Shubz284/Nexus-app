@@ -62,7 +62,7 @@ async function getCurrentTabData() {
   }
 
   return {
-    title: activeTab.title || "",
+    title:"",
     url: activeTab.url || "",
   };
 }

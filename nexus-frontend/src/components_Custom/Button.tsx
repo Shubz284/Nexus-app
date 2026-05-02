@@ -1,15 +1,17 @@
 import type { ReactElement } from "react";
 
 export interface ButtonProps {
-  variant: "primary" | "secondary";
-  size: "sm" | "md" | "lg";
+  variant?: "primary" | "secondary";
+  size?: "sm" | "md" | "lg";
   text?: string;
   startIcon?: ReactElement;
   onClick?: () => void;
-  fullWidth?:boolean;
-  loading?:boolean
+  fullWidth?: boolean;
+  loading?: boolean;
+  className?: string;
+  children?: React.ReactNode;
+  disabled?: boolean;
 }
-
 
 const Button = (props: ButtonProps) => {
   const variantClassses = {
@@ -22,14 +24,28 @@ const Button = (props: ButtonProps) => {
     md: "px-3 py-1.5",
     lg: "px-6 py-3",
   };
+
+  // If className is provided, use it directly (for flexible styling)
+  if (props.className) {
+    return (
+      <button
+        onClick={props.onClick}
+        className={props.className}
+        disabled={props.disabled}
+      >
+        {props.children}
+      </button>
+    );
+  }
+
   return (
     <div>
       <button
         onClick={props.onClick}
-        className={`${variantClassses[props.variant]} ${sizeStyles[props.size]} 
-        flex cursor-pointer items-center gap-2 rounded-lg font-normal 
-        ${props.fullWidth ? " w-full flex justify-center items-center":""}
-        `}
+        className={`${variantClassses[props.variant || "primary"]} ${
+          sizeStyles[props.size || "md"]
+        } flex cursor-pointer items-center gap-2 rounded-lg font-normal ${props.fullWidth ? "flex w-full items-center justify-center" : ""} `}
+        disabled={props.disabled}
       >
         {props.startIcon && <span>{props.startIcon}</span>}
         <span>{props.text}</span>
