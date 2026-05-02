@@ -1,114 +1,137 @@
 # Nexus
-Nexus is a full-stack web application designed to be your personal "second brain" for organizing and sharing digital content. It allows you to save links from various platforms, automatically categorizing and tagging them for easy retrieval. The project includes a web dashboard, a secure backend, and a convenient Chrome extension for quick saving.
 
-## Core Features
+Nexus is a full-stack second brain for saving, organizing, and sharing information from the web. The workspace combines a React app, an Express/MongoDB backend, and a Chrome extension so users can capture content quickly and revisit it later.
 
--   **Multi-Platform Content Aggregation**: Save content from popular sites like YouTube, Twitter, Instagram, and Facebook. The app automatically detects the content type.
--   **User Authentication**: Secure user registration and login using either local email/password or Google OAuth 2.0, managed with Passport.js and JWTs.
--   **Interactive Dashboard**: A clean, responsive dashboard built with React and Tailwind CSS to view, filter, and search your saved content.
--   **Chrome Extension**: A "Quick Save" browser extension to capture links, titles, and tags from the current page without leaving your tab.
--   **Smart Organization**: Add custom tags to your content for powerful filtering and organization.
--   **Search Functionality**: Instantly find saved items by searching through titles and tags.
--   **Shareable Collections**: Generate a unique, public link to share your entire "brain" with others.
+## What The App Does
+
+- Save Brain items from YouTube, Twitter/X, Instagram, Facebook, and other links.
+- Organize saved content with tags and search.
+- Sign in with email/password or Google OAuth.
+- Write private notes with pinning, colors, tags, and search.
+- Upload private documents, then edit, pin, delete, and search them.
+- Share a public Brain collection with a generated link.
+- Capture the current tab from the browser extension without leaving the page.
+
+## Project Layout
+
+- `nexus-frontend/`: React + Vite + TypeScript client.
+- `Nexus-backend/`: Express + TypeScript API server.
+- `nexus-extension/`: Chrome extension popup for quick saving.
 
 ## Tech Stack
 
-| Component         | Technologies                                                                                                                                                             |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Frontend**      | [React](https://react.dev/), [Vite](https://vitejs.dev/), [TypeScript](https://www.typescriptlang.org/), [Tailwind CSS](https://tailwindcss.com/), [shadcn/ui](https://ui.shadcn.com/), [Zustand](https://zustand-demo.pmnd.rs/), [React Router](https://reactrouter.com/), [Axios](https://axios-http.com/) |
-| **Backend**       | [Node.js](https://nodejs.org/), [Express](https://expressjs.com/), [TypeScript](https://www.typescriptlang.org/), [MongoDB](https://www.mongodb.com/), [Mongoose](https://mongoosejs.com/), [Passport.js](http://www.passportjs.org/), [JWT](https://jwt.io/), [Zod](https://zod.dev/) |
-| **Browser Extension** | HTML, CSS, JavaScript (Web APIs)                                                                                                                                         |
+| Area      | Stack                                                                                          |
+| --------- | ---------------------------------------------------------------------------------------------- |
+| Frontend  | React, Vite, TypeScript, Tailwind CSS, shadcn/ui, Zustand, React Router, TanStack Query, Axios |
+| Backend   | Node.js, Express, TypeScript, MongoDB, Mongoose, Passport.js, JWT, Zod, Multer                 |
+| Extension | HTML, CSS, JavaScript                                                                          |
 
-## Project Structure
+## App Routes
 
-The repository is organized into three main sub-projects:
+- `/`: Landing page
+- `/auth/*`: Login and signup flow
+- `/app/dashboard`: Brain dashboard
+- `/app/notes`: Notes workspace
+- `/app/documents`: Document workspace
+- `/share/:shareLink`: Public shared Brain view
 
--   `nexus-frontend/`: The React-based user interface and dashboard.
--   `Nexus-backend/`: The Express.js server handling API requests, database interactions, and user authentication.
--   `nexus-extension/`: The Chrome browser extension for quick content saving.
+## Backend Routes
 
-## Getting Started
+- `POST /auth/signup`
+- `POST /auth/login`
+- `GET /auth/refresh`
+- `GET /auth/google`
+- `GET /auth/google/callback`
+- `GET /auth/user`
+- `POST /auth/logout`
+- `POST /auth/content`
+- `GET /auth/content`
+- `DELETE /auth/content`
+- `POST /auth/brain/share`
+- `GET /auth/brain/:shareLink`
+- `GET /auth/preview?url=...`
+- `POST /notes`
+- `GET /notes`
+- `GET /notes/:noteId`
+- `PUT /notes/:noteId`
+- `DELETE /notes/:noteId`
+- `PATCH /notes/:noteId/toggle-pin`
+- `GET /notes/search/query?q=...`
+- `POST /documents`
+- `GET /documents`
+- `GET /documents/:documentId`
+- `PUT /documents/:documentId`
+- `DELETE /documents/:documentId`
+- `PATCH /documents/:documentId/toggle-pin`
+- `GET /documents/search/query?q=...`
 
-Follow these steps to set up and run the project locally.
+## Requirements
 
-### Prerequisites
+- Node.js 18 or newer
+- npm
+- MongoDB locally or via MongoDB Atlas
 
--   Node.js (v18 or later)
--   npm (Node Package Manager)
--   A running MongoDB instance (local or a cloud service like MongoDB Atlas)
+## Local Setup
 
-### 1. Backend Setup (`Nexus-backend`)
+### Backend
 
-1.  Navigate to the backend directory:
-    ```sh
-    cd Nexus-backend
-    ```
+```sh
+cd Nexus-backend
+npm install
+npm run build
+npm run dev
+```
 
-2.  Install the dependencies:
-    ```sh
-    npm install
-    ```
+Create a `.env` file in `Nexus-backend` with at least these values:
 
-3.  Create a `.env` file by copying the example:
-    ```sh
-    cp .env.example .env
-    ```
+- `MONGO_URI`
+- `PORT`
+- `SESSION_SECRET`
+- `ACCESS_KEY`
+- `REFRESH_KEY`
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `GOOGLE_REDIRECT_URI`
+- `FRONTEND_URI`
+- `EXTENSION_ORIGIN` optional, for a fixed extension origin in production
+- `NODE_ENV`
 
-4.  Edit the `.env` file and provide the required values. At a minimum, you must configure:
-    -   `MONGO_URI`: Your MongoDB connection string.
-    -   `PORT`: The port for the backend server (e.g., 3000).
-    -   `SESSION_SECRET`, `ACCESS_KEY`, `REFRESH_KEY`: Long, random strings for security.
-    -   `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`: Your Google OAuth 2.0 credentials.
-    -   `FRONTEND_URI`: The URL of your running frontend (e.g., `http://localhost:5173`).
-    -   `GOOGLE_REDIRECT_URI`: The backend callback URL (e.g., `http://localhost:3000/auth/google/callback`).
+### Frontend
 
-5.  Start the development server:
-    ```sh
-    npm run dev
-    ```
-    The backend will be running on the port specified in your `.env` file.
+```sh
+cd ../nexus-frontend
+npm install
+npm run dev
+```
 
-### 2. Frontend Setup (`nexus-frontend`)
+Set `VITE_SERVER_URL` in `nexus-frontend/.env` to the backend URL, for example `http://localhost:3000`.
 
-1.  Navigate to the frontend directory:
-    ```sh
-    cd ../nexus-frontend
-    ```
+Useful frontend scripts:
 
-2.  Install the dependencies:
-    ```sh
-    npm install
-    ```
+- `npm run build`
+- `npm run lint`
+- `npm run preview`
 
-3.  Create a `.env` file by copying the example:
-    ```sh
-    cp .env.example .env
-    ```
+### Chrome Extension
 
-4.  Edit the `.env` file and set the backend URL:
-    -   `VITE_SERVER_URL`: The full URL of your running backend (e.g., `http://localhost:3000`).
+1. Open `chrome://extensions` in Chrome.
+2. Enable Developer mode.
+3. Click Load unpacked.
+4. Select the `nexus-extension` folder.
+5. Pin the extension if you want easier access.
 
-5.  Start the development server:
-    ```sh
-    npm run dev
-    ```
-    The frontend will be available at `http://localhost:5173` (or another port if 5173 is in use).
+The popup auto-fills the current tab title, URL, and content type, then sends `POST /auth/content` with browser cookies. You need to be logged in to Nexus for saves to work.
 
-### 3. Chrome Extension Setup (`nexus-extension`)
+## Common Workflow
 
-1.  Open Google Chrome and navigate to `chrome://extensions`.
-2.  Enable **Developer mode** using the toggle in the top-right corner.
-3.  Click the **Load unpacked** button.
-4.  Select the `nexus-extension` folder from the repository.
-5.  Pin the "Nexus Quick Save" extension to your toolbar for easy access.
+1. Sign in with email/password or Google.
+2. Save Brain content from the dashboard or the extension.
+3. Create notes or upload documents from the authenticated app.
+4. Search, pin, and organize items as needed.
+5. Share a Brain collection when you want a public link.
 
-**Note**: For the extension to work, you must be logged into the Nexus web application in your browser, as it uses the same session cookies for authentication.
+## Notes
 
-## Usage
-
-1.  **Register/Login**: Open the web application and create an account or sign in using email/password or Google.
-2.  **Add Content**:
-    -   **Via Web App**: On the dashboard, click the "Add" button to open a modal where you can paste a link, add a title, and assign tags.
-    -   **Via Extension**: While browsing a page you want to save, click the Nexus extension icon. The title and link will be auto-filled. Add optional tags and click "Save".
-3.  **View and Filter**: Your saved content appears on the dashboard. Use the sidebar to filter by content type (All, Twitter, YouTube, etc.) or use the search bar to find content by title or tag.
-4.  **Share Your Brain**: Click the "Share" button on the dashboard to generate a unique public URL for your entire collection. Anyone with the link can view your curated content.
+- The backend serves uploaded files from `/uploads`.
+- The frontend has a landing page and a dedicated shared Brain route.
+- The extension README contains extra notes specific to browser setup.
