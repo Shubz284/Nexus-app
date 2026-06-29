@@ -1,5 +1,4 @@
 import DocumentsPage from "../pages/DocumentsPage";
-{/* <Route path="/app/documents" element={<DocumentsPage />} />; */}
 import Dashboard from "@/pages/Dashboard";
 import NotesPage from "@/pages/NotesPage";
 

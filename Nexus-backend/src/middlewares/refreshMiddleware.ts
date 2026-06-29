@@ -1,12 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import passport from "passport";
+import { authCookieOptions } from "../config/cookies.js";
 
-const cookieOptions = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax" as const,
-  path: "/",
-};
+const cookieOptions = authCookieOptions;
 
 export default async function refreshMiddleware(
   req: Request,

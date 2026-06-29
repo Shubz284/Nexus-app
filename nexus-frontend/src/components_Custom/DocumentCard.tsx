@@ -1,5 +1,6 @@
 import { Pin, Trash2, Edit2, PinOff, FileText, Download } from "lucide-react";
 import React from "react";
+import { SERVER_URL } from "@/config/env";
 
 interface DocumentCardProps {
   document: {
@@ -95,7 +96,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
         {/* Action Buttons */}
         <div className="flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
           <a
-            href={`/uploads/${document.filename}`}
+            href={`${SERVER_URL}/uploads/${document.filename}`}
             download
             className="rounded p-1 hover:bg-green-200"
             title="Download document"

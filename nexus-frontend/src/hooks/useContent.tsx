@@ -20,7 +20,7 @@ const useContent = () => {
     refresh();
     let interval = setInterval(() => {
       refresh();
-    }, 10 * 1000);
+    }, 60 * 1000); // 60s instead of 10s, much gentler
 
     return () => clearInterval(interval);
   }, []);

@@ -39,6 +39,9 @@ if (missingEnvVars.length > 0) {
 // --- Standard Middleware ---
 const app = express();
 
+// Required behind Render/nginx so secure cookies and HTTPS redirects work.
+app.set("trust proxy", 1);
+
 const allowedOrigins = [
   process.env.FRONTEND_URI,
   process.env.EXTENSION_ORIGIN,
@@ -102,6 +105,10 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // ----Routes---
+app.get("/health", (_req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 app.use("/auth", authRouter);
 app.use("/auth", oauthRouter);
 app.use("/notes", notesRouter);
@@ -116,8 +123,9 @@ async function main() {
     throw new Error("MONGO_URI environment variable is required");
   }
   await mongoose.connect(process.env.MONGO_URI);
-  app.listen(process.env.PORT, () => {
-    console.log(`Listening on port ${process.env.PORT}`);
+  const port = Number(process.env.PORT) || 3000;
+  app.listen(port, () => {
+    console.log(`Listening on port ${port}`);
   });
 }
 

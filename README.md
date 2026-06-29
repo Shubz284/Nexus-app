@@ -156,16 +156,19 @@ Protected routes use JWT via httpOnly cookies (`withCredentials: true`). Brain c
 ### Backend (Render)
 
 1. Connect this repo and set root directory to `Nexus-backend`
-2. **Build:** `npm install` | **Start:** `npm start`
-3. Set `MONGO_URI`, `ACCESS_KEY`, `REFRESH_KEY`, `SESSION_SECRET`, Google OAuth vars, and `FRONTEND_URI` in environment variables
+2. **Build:** `npm install && npm run build` | **Start:** `npm start`
+   > If build fails with missing `@types/*`, ensure type packages are in `dependencies` (not only `devDependencies`) because Render skips dev deps when `NODE_ENV=production`.
+3. Set `MONGO_URI`, `ACCESS_KEY`, `REFRESH_KEY`, `SESSION_SECRET`, Google OAuth vars, and `FRONTEND_URI` in environment variables (`PORT` is set automatically by Render)
 4. Set `NODE_ENV=production` for secure cookies
 
 ### Frontend (Vercel)
 
 1. Connect this repo and set root directory to `nexus-frontend`
-2. Set `VITE_SERVER_URL` to your deployed backend URL
-3. Set `VITE_APP_URL` to your deployed frontend URL
-4. Deploy — add a `vercel.json` with SPA rewrites if needed for client-side routing
+2. Set environment variables:
+   - `VITE_SERVER_URL=https://nexus-app-ff3i.onrender.com`
+   - `VITE_APP_URL=https://<your-vercel-app>.vercel.app` *(set after first deploy, then redeploy)*
+3. Build command: `npm run build` (default) | Output directory: `dist`
+4. `vercel.json` includes SPA rewrites for client-side routing
 
 ### Chrome Extension (Production)
 

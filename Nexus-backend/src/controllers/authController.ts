@@ -5,16 +5,9 @@ import * as z from "zod";
 import { ContentModel, LinkModel, TagModel, userModel } from "../db.js";
 import { random } from "../utils/utils.js";
 import { loginSchema, signupSchema } from "../schema/authSchema.js";
+import { authCookieMaxAge, authCookieOptions } from "../config/cookies.js";
 
-
-const cookieOptions = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax" as const,
-  path: "/",
-};
-
-const authCookieMaxAge = 7 * 24 * 60 * 60 * 1000;
+const cookieOptions = authCookieOptions;
 
 function requireEnv(name: string) {
   const value = process.env[name];
