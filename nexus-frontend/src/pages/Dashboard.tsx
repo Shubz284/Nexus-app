@@ -13,12 +13,23 @@ import SearchBar from "../components_Custom/SearchBar";
 import { toast } from "sonner";
 import UserProfile from "../components_Custom/UserProfile";
 
+type AiExplainResult = {
+  summary: string;
+  keyPoints: string[];
+  relatedTopics: string[];
+  disclaimer: string;
+};
+
 const Dashboard = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { contents, refresh } = useContent();
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState("");
+  const [aiResult, setAiResult] = useState<AiExplainResult | null>(null);
+  const [aiCache, setAiCache] = useState<Record<string, AiExplainResult>>({});
 
   // Filter contents based on search query and type filter
   const filteredContents = useMemo(() => {
@@ -52,6 +63,55 @@ const Dashboard = () => {
   useEffect(() => {
     refresh();
   }, [modalOpen]);
+
+  useEffect(() => {
+    const query = searchQuery.trim();
+    if (query.length < 2) {
+      setAiLoading(false);
+      setAiError("");
+      setAiResult(null);
+      return;
+    }
+
+    const cacheKey = query.toLowerCase();
+    if (aiCache[cacheKey]) {
+      setAiError("");
+      setAiResult(aiCache[cacheKey]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setAiLoading(true);
+      setAiError("");
+
+      try {
+        const response = await axiosInstance.post("/ai/explain", {
+          query,
+        });
+        const result = response?.data?.result as AiExplainResult | undefined;
+
+        if (!result) {
+          throw new Error("No AI result returned");
+        }
+
+        setAiResult(result);
+        setAiCache((prev) => ({
+          ...prev,
+          [cacheKey]: result,
+        }));
+      } catch (error) {
+        console.error("AI explain error:", error);
+        const backendMessage =
+          (error as any)?.response?.data?.message ||
+          "AI insight is currently unavailable. Showing normal results.";
+        setAiError(backendMessage);
+      } finally {
+        setAiLoading(false);
+      }
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, aiCache]);
 
   const handleShareBrain = async function () {
     const response = await axiosInstance.post(`/auth/brain/share`, {
@@ -143,6 +203,65 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
+
+          {searchQuery.trim().length >= 2 && (
+            <div className="mb-4 rounded-xl border border-indigo-100 bg-gradient-to-r from-indigo-50 to-blue-50 p-4 lg:mb-6">
+              <div className="mb-2 text-sm font-semibold text-indigo-700">
+                AI Summary for: {searchQuery.trim()}
+              </div>
+
+              {aiLoading && (
+                <div className="text-sm text-gray-600">Thinking...</div>
+              )}
+
+              {!aiLoading && aiError && (
+                <div className="text-sm text-red-600">{aiError}</div>
+              )}
+
+              {!aiLoading && !aiError && aiResult && (
+                <div className="space-y-3">
+                  <p className="text-sm leading-6 text-gray-800">
+                    {aiResult.summary}
+                  </p>
+
+                  {aiResult.keyPoints?.length > 0 && (
+                    <div>
+                      <div className="mb-1 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                        Key points
+                      </div>
+                      <ul className="list-inside list-disc space-y-1 text-sm text-gray-700">
+                        {aiResult.keyPoints.map((point, index) => (
+                          <li key={`${point}-${index}`}>{point}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {aiResult.relatedTopics?.length > 0 && (
+                    <div>
+                      <div className="mb-1 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                        Related topics
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {aiResult.relatedTopics.map((topic, index) => (
+                          <button
+                            key={`${topic}-${index}`}
+                            onClick={() => setSearchQuery(topic)}
+                            className="rounded-full border border-indigo-200 bg-white px-3 py-1 text-xs text-indigo-700 hover:bg-indigo-100"
+                          >
+                            {topic}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <p className="text-xs text-gray-500">{aiResult.disclaimer}</p>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="mt-4 grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 lg:mt-6 lg:grid-cols-3 lg:gap-6 xl:grid-cols-4">
             {filteredContents.length > 0 ? (
               filteredContents.map((content: any, index: number) => {

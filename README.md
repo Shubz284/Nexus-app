@@ -1,137 +1,176 @@
 # Nexus
 
-Nexus is a full-stack second brain for saving, organizing, and sharing information from the web. The workspace combines a React app, an Express/MongoDB backend, and a Chrome extension so users can capture content quickly and revisit it later.
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-06B6D4?logo=tailwindcss&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express-5-000000?logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?logo=mongodb&logoColor=white)
+![Mongoose](https://img.shields.io/badge/Mongoose-8-880000?logo=mongoose&logoColor=white)
+![Passport](https://img.shields.io/badge/Passport-JWT%20%2B%20OAuth-34E27A?logo=passport&logoColor=white)
+![Groq](https://img.shields.io/badge/Groq-AI-F55036)
+![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-4285F4?logo=googlechrome&logoColor=white)
 
-## What The App Does
+A full-stack second brain for saving, organizing, and sharing web content, notes, and documents — with AI-powered search insights and a Chrome extension for quick capture.
 
-- Save Brain items from YouTube, Twitter/X, Instagram, Facebook, and other links.
-- Organize saved content with tags and search.
-- Sign in with email/password or Google OAuth.
-- Write private notes with pinning, colors, tags, and search.
-- Upload private documents, then edit, pin, delete, and search them.
-- Share a public Brain collection with a generated link.
-- Capture the current tab from the browser extension without leaving the page.
+## Features
 
-## Project Layout
-
-- `nexus-frontend/`: React + Vite + TypeScript client.
-- `Nexus-backend/`: Express + TypeScript API server.
-- `nexus-extension/`: Chrome extension popup for quick saving.
+- User registration and login (JWT + Google OAuth)
+- **Brain** — save links from YouTube, Twitter/X, Instagram, Facebook, and other URLs
+- Filter Brain content by type, search by title or tags, and preview URLs via Open Graph
+- AI explain summaries on Brain search (Groq, debounced)
+- Share Brain collections with a public hash link
+- **Notes** — create, edit, delete, pin, color-code, tag, and search private notes
+- **Documents** — upload PDF/DOC/DOCX (up to 50 MB), edit metadata, pin, delete, and search
+- Responsive card-based dashboard with sidebar navigation
+- Chrome extension to quick-save the current tab without leaving the page
 
 ## Tech Stack
 
-| Area      | Stack                                                                                          |
-| --------- | ---------------------------------------------------------------------------------------------- |
-| Frontend  | React, Vite, TypeScript, Tailwind CSS, shadcn/ui, Zustand, React Router, TanStack Query, Axios |
-| Backend   | Node.js, Express, TypeScript, MongoDB, Mongoose, Passport.js, JWT, Zod, Multer                 |
-| Extension | HTML, CSS, JavaScript                                                                          |
+| Layer | Technologies |
+| ----- | ------------ |
+| Frontend | React 19, TypeScript, Vite 7, Tailwind CSS 4, shadcn/ui (Radix UI), React Router 7, TanStack Query, Zustand, Axios, Sonner, React Hook Form, Zod, Lucide React, date-fns |
+| Backend | Node.js, Express 5, TypeScript, MongoDB, Mongoose, Passport.js (JWT + Google OAuth), bcrypt, Zod, Multer, cookie-parser, express-session, jsonwebtoken, OpenAI SDK (Groq-compatible), cors |
+| Extension | Chrome Manifest V3, HTML, CSS, JavaScript |
+| AI | Groq API (`llama-3.3-70b-versatile`) |
+| Deploy | Vercel (frontend), Render (backend), MongoDB Atlas (database) |
 
-## App Routes
+## Project Structure
 
-- `/`: Landing page
-- `/auth/*`: Login and signup flow
-- `/app/dashboard`: Brain dashboard
-- `/app/notes`: Notes workspace
-- `/app/documents`: Document workspace
-- `/share/:shareLink`: Public shared Brain view
+```
+Week-15-Project/
+├── nexus-frontend/        # React + Vite SPA
+│   └── src/
+│       ├── api/           # Axios instance + interceptors
+│       ├── components/    # shadcn/ui primitives
+│       ├── components_Custom/  # Cards, modals, sidebar
+│       ├── hooks/         # useContent, useNotes, useDocuments
+│       ├── pages/         # Dashboard, Notes, Documents, Auth
+│       └── store/         # Zustand + TanStack Query
+├── Nexus-backend/         # Express REST API
+│   └── src/
+│       ├── config/        # Passport, nodemailer
+│       ├── controllers/   # auth, notes, documents, oauth
+│       ├── middlewares/   # errorHandler, refreshMiddleware
+│       ├── routes/        # auth, oauth, notes, documents, ai
+│       ├── schema/        # Zod validation
+│       ├── services/      # aiExplainService (Groq)
+│       └── db.ts          # Mongoose models
+├── nexus-extension/       # Chrome MV3 quick-save popup
+└── README.md
+```
 
-## Backend Routes
+## Getting Started
 
-- `POST /auth/signup`
-- `POST /auth/login`
-- `GET /auth/refresh`
-- `GET /auth/google`
-- `GET /auth/google/callback`
-- `GET /auth/user`
-- `POST /auth/logout`
-- `POST /auth/content`
-- `GET /auth/content`
-- `DELETE /auth/content`
-- `POST /auth/brain/share`
-- `GET /auth/brain/:shareLink`
-- `GET /auth/preview?url=...`
-- `POST /notes`
-- `GET /notes`
-- `GET /notes/:noteId`
-- `PUT /notes/:noteId`
-- `DELETE /notes/:noteId`
-- `PATCH /notes/:noteId/toggle-pin`
-- `GET /notes/search/query?q=...`
-- `POST /documents`
-- `GET /documents`
-- `GET /documents/:documentId`
-- `PUT /documents/:documentId`
-- `DELETE /documents/:documentId`
-- `PATCH /documents/:documentId/toggle-pin`
-- `GET /documents/search/query?q=...`
+### Prerequisites
 
-## Requirements
+- Node.js 18+
+- MongoDB Atlas account (or local MongoDB)
+- Google OAuth credentials (for Google sign-in)
+- Groq API key (optional — for AI explain)
 
-- Node.js 18 or newer
-- npm
-- MongoDB locally or via MongoDB Atlas
-
-## Local Setup
-
-### Backend
+### Backend Setup
 
 ```sh
 cd Nexus-backend
 npm install
-npm run build
+cp .env.example .env
+# Edit .env with MONGO_URI, JWT secrets, Google OAuth, FRONTEND_URI
 npm run dev
 ```
 
-Create a `.env` file in `Nexus-backend` with at least these values:
+Server runs on `http://localhost:3000`.
 
-- `MONGO_URI`
-- `PORT`
-- `SESSION_SECRET`
-- `ACCESS_KEY`
-- `REFRESH_KEY`
-- `GOOGLE_CLIENT_ID`
-- `GOOGLE_CLIENT_SECRET`
-- `GOOGLE_REDIRECT_URI`
-- `FRONTEND_URI`
-- `EXTENSION_ORIGIN` optional, for a fixed extension origin in production
-- `NODE_ENV`
+**Required `.env` variables:** `MONGO_URI`, `PORT`, `SESSION_SECRET`, `ACCESS_KEY`, `REFRESH_KEY`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`, `FRONTEND_URI`
 
-### Frontend
+**Optional:** `GROQ_API_KEY`, `GROQ_MODEL`, `EXTENSION_ORIGIN`, `NODE_ENV`
+
+> AI uses **Groq** (`GROQ_API_KEY`), not Gemini. Update `.env` if copying from `.env.example`.
+
+### Frontend Setup
 
 ```sh
-cd ../nexus-frontend
+cd nexus-frontend
 npm install
+```
+
+Create `.env`:
+
+```env
+VITE_SERVER_URL=http://localhost:3000
+VITE_APP_URL=http://localhost:5173
+```
+
+```sh
 npm run dev
 ```
 
-Set `VITE_SERVER_URL` in `nexus-frontend/.env` to the backend URL, for example `http://localhost:3000`.
+App runs on `http://localhost:5173`.
 
-Useful frontend scripts:
+### Chrome Extension Setup
 
-- `npm run build`
-- `npm run lint`
-- `npm run preview`
+1. Open `chrome://extensions` and enable **Developer mode**
+2. Click **Load unpacked** and select the `nexus-extension` folder
+3. Log in to Nexus in the same browser before saving from the popup
 
-### Chrome Extension
+See [`nexus-extension/README.md`](nexus-extension/README.md) for details.
 
-1. Open `chrome://extensions` in Chrome.
-2. Enable Developer mode.
-3. Click Load unpacked.
-4. Select the `nexus-extension` folder.
-5. Pin the extension if you want easier access.
+## API Reference
 
-The popup auto-fills the current tab title, URL, and content type, then sends `POST /auth/content` with browser cookies. You need to be logged in to Nexus for saves to work.
+| Method | Endpoint | Description |
+| ------ | -------- | ----------- |
+| POST | `/auth/signup` | Register user |
+| POST | `/auth/login` | Login, set JWT cookies |
+| GET | `/auth/refresh` | Refresh access token |
+| GET | `/auth/user` | Get user profile |
+| POST | `/auth/logout` | Clear cookies |
+| GET | `/auth/google` | Start Google OAuth |
+| GET | `/auth/google/callback` | OAuth callback |
+| POST | `/auth/content` | Add Brain content |
+| GET | `/auth/content` | List Brain content |
+| DELETE | `/auth/content` | Delete Brain content |
+| POST | `/auth/brain/share` | Enable/disable public share link |
+| GET | `/auth/brain/:shareLink` | Public shared Brain (no auth) |
+| GET | `/auth/preview?url=` | URL Open Graph preview |
+| POST | `/notes` | Create note |
+| GET | `/notes` | List notes |
+| GET | `/notes/:noteId` | Get note |
+| PUT | `/notes/:noteId` | Update note |
+| DELETE | `/notes/:noteId` | Delete note |
+| PATCH | `/notes/:noteId/toggle-pin` | Pin/unpin note |
+| GET | `/notes/search/query?q=` | Search notes |
+| POST | `/documents` | Upload document (multipart) |
+| GET | `/documents` | List documents |
+| GET | `/documents/:documentId` | Get document |
+| PUT | `/documents/:documentId` | Update document metadata |
+| DELETE | `/documents/:documentId` | Delete document |
+| PATCH | `/documents/:documentId/toggle-pin` | Pin/unpin document |
+| GET | `/documents/search/query?q=` | Search documents |
+| POST | `/ai/explain` | AI summary for Brain search query |
 
-## Common Workflow
+Protected routes use JWT via httpOnly cookies (`withCredentials: true`). Brain content creation also requires the `X-Nexus-Client` header (`web` or `extension`).
 
-1. Sign in with email/password or Google.
-2. Save Brain content from the dashboard or the extension.
-3. Create notes or upload documents from the authenticated app.
-4. Search, pin, and organize items as needed.
-5. Share a Brain collection when you want a public link.
+## Deployment
 
-## Notes
+### Backend (Render)
 
-- The backend serves uploaded files from `/uploads`.
-- The frontend has a landing page and a dedicated shared Brain route.
-- The extension README contains extra notes specific to browser setup.
+1. Connect this repo and set root directory to `Nexus-backend`
+2. **Build:** `npm install` | **Start:** `npm start`
+3. Set `MONGO_URI`, `ACCESS_KEY`, `REFRESH_KEY`, `SESSION_SECRET`, Google OAuth vars, and `FRONTEND_URI` in environment variables
+4. Set `NODE_ENV=production` for secure cookies
+
+### Frontend (Vercel)
+
+1. Connect this repo and set root directory to `nexus-frontend`
+2. Set `VITE_SERVER_URL` to your deployed backend URL
+3. Set `VITE_APP_URL` to your deployed frontend URL
+4. Deploy — add a `vercel.json` with SPA rewrites if needed for client-side routing
+
+### Chrome Extension (Production)
+
+Set `EXTENSION_ORIGIN=chrome-extension://<your-extension-id>` in the backend environment and update `host_permissions` in `nexus-extension/manifest.json` to your production URLs.
+
+## License
+
+ISC

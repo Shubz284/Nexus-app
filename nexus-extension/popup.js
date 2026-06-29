@@ -62,7 +62,7 @@ async function getCurrentTabData() {
   }
 
   return {
-    title:"",
+    title: "",
     url: activeTab.url || "",
   };
 }
@@ -73,6 +73,7 @@ async function saveContent(payload) {
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
+      "X-Nexus-Client": "extension",
     },
     body: JSON.stringify(payload),
   });

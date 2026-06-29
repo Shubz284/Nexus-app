@@ -28,8 +28,25 @@ interface CardProps {
   onDelete: (contentId: string) => void;
 }
 
+const getInstagramEmbedUrl = (url: string) => {
+  try {
+    const parsed = new URL(url);
+    const parts = parsed.pathname.split("/").filter(Boolean);
+    if (parts.length < 2) return null;
+
+    const [kind, id] = parts;
+    if (!["p", "reel", "tv"].includes(kind) || !id) return null;
+
+    return `https://www.instagram.com/${kind}/${id}/embed/captioned/`;
+  } catch {
+    return null;
+  }
+};
+
 const Card = (props: CardProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const instagramEmbedUrl =
+    props.type === "instagram" ? getInstagramEmbedUrl(props.link) : null;
 
   const handleShare = async () => {
     // Check if Web Share API is supported
@@ -120,28 +137,28 @@ const Card = (props: CardProps) => {
                 {props.title}
               </div>
             </div>
-                <div className="ml-2 flex flex-shrink-0 items-center gap-2">
-                  <button
-                    onClick={handleShare}
-                    className="rounded p-1.5 transition-colors hover:bg-gray-100"
-                    aria-label="Share"
-                  >
-                    <Share2
-                      size={18}
-                      className="text-neutral-600 hover:text-neutral-900"
-                    />
-                  </button>
-                  <button
-                    onClick={handleDeleteClick}
-                    className="rounded p-1.5 transition-colors hover:bg-red-50"
-                    aria-label="Delete"
-                  >
-                    <Trash2
-                      size={18}
-                      className="text-neutral-600 hover:text-red-600"
-                    />
-                  </button>
-                </div>
+            <div className="ml-2 flex flex-shrink-0 items-center gap-2">
+              <button
+                onClick={handleShare}
+                className="rounded p-1.5 transition-colors hover:bg-gray-100"
+                aria-label="Share"
+              >
+                <Share2
+                  size={18}
+                  className="text-neutral-600 hover:text-neutral-900"
+                />
+              </button>
+              <button
+                onClick={handleDeleteClick}
+                className="rounded p-1.5 transition-colors hover:bg-red-50"
+                aria-label="Delete"
+              >
+                <Trash2
+                  size={18}
+                  className="text-neutral-600 hover:text-red-600"
+                />
+              </button>
+            </div>
           </div>
           <div className="mt-3 flex-1 overflow-hidden sm:mt-5">
             {props.type == "youtube" && (
@@ -165,25 +182,25 @@ const Card = (props: CardProps) => {
             )}
             {props.type == "instagram" && (
               <div className="h-full overflow-hidden rounded-sm border border-gray-200 bg-gray-50">
-                <a
-                  href={props.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block h-full"
-                >
-                  <img
-                    src={`https://v1.screenshot.11ty.dev/${encodeURIComponent(props.link)}/opengraph/`}
-                    alt="Instagram post preview"
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      // Fallback if screenshot service fails
-                      const target = e.target as HTMLImageElement;
-                      target.onerror = null;
-                      target.src =
-                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23f3f4f6' width='400' height='400'/%3E%3Ctext fill='%239ca3af' font-family='sans-serif' font-size='18' x='50%25' y='50%25' text-anchor='middle' dominant-baseline='middle'%3EInstagram Post%3C/text%3E%3C/svg%3E";
-                    }}
-                  />
-                </a>
+                {instagramEmbedUrl ? (
+                  <iframe
+                    title="Instagram post preview"
+                    src={instagramEmbedUrl}
+                    className="h-full w-full"
+                    frameBorder="0"
+                    scrolling="no"
+                    allowTransparency={true}
+                  ></iframe>
+                ) : (
+                  <a
+                    href={props.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex h-full items-center justify-center p-4 text-center text-sm text-gray-600"
+                  >
+                    Open Instagram post
+                  </a>
+                )}
               </div>
             )}
             {props.type == "facebook" && (

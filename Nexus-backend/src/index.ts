@@ -1,8 +1,10 @@
 import express from "express";
 import cors from "cors";
-import authRouter from "./routes/authRoutes.js";
-import notesRouter from "./routes/notesRoutes.js";
-import documentsRouter from "./routes/documentsRoutes.js";
+import authRouter from "./routes/authRoutes";
+import oauthRouter from "./routes/oauthRoutes.js";
+import notesRouter from "./routes/notesRoutes";
+import documentsRouter from "./routes/documentsRoutes";
+import aiRouter from "./routes/aiRoutes.js";
 import mongoose from "mongoose";
 import session from "express-session";
 import errorHandler from "./middlewares/errorHandler.js";
@@ -101,8 +103,10 @@ app.use(passport.session());
 
 // ----Routes---
 app.use("/auth", authRouter);
+app.use("/auth", oauthRouter);
 app.use("/notes", notesRouter);
 app.use("/documents", documentsRouter);
+app.use("/ai", aiRouter);
 
 // error handler
 app.use(errorHandler);

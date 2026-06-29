@@ -1,7 +1,18 @@
 import { NextFunction, Request, Response } from "express";
 import passport from "passport";
 
-export default async function refreshMiddleware(req:Request, res:Response, next:NextFunction) {
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  path: "/",
+};
+
+export default async function refreshMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   const fn = passport.authenticate(
     "jwt-refresh",
     { session: false },
@@ -17,8 +28,8 @@ export default async function refreshMiddleware(req:Request, res:Response, next:
         console.log("Refresh token expired. Clearing cookies and logging out.");
 
         // Clear the invalid cookies from the user's browser
-        res.clearCookie("accessToken");
-        res.clearCookie("refreshToken");
+        res.clearCookie("accessToken", cookieOptions);
+        res.clearCookie("refreshToken", cookieOptions);
 
         // Send a specific response that the frontend can identify
         return res.status(401).json({

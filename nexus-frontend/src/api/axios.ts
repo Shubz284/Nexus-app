@@ -11,35 +11,40 @@ const BASE_URL = SERVER_URL;
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
   withCredentials: true,
+  headers: {
+    "X-Nexus-Client": "web",
+  },
 });
 
 // Set up the response interceptor
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    // The condition is now more specific
+    const originalRequest = error.config;
+    const isAuthPage = window.location.pathname.startsWith("/auth");
+    const requestUrl = originalRequest?.url ?? "";
+
     if (
-      error.response &&
-      error.response.status === 401 &&
-      // ✅ ADD THIS CHECK: Only run this logic if we are NOT on an auth page
-      !window.location.pathname.startsWith("/auth")
+      error.response?.status === 401 &&
+      !isAuthPage &&
+      originalRequest &&
+      !originalRequest._retry &&
+      requestUrl !== "/auth/refresh" &&
+      requestUrl !== "/auth/logout"
     ) {
-      console.error(
-        "Session expired! Caught by interceptor, redirecting to login.",
-      );
+      originalRequest._retry = true;
+
       try {
-        // Attempt to log the user out to clear the session
-        await axiosInstance.post("/auth/logout");
-      } catch (logoutError) {
-        console.error("Error during auto-logout:", logoutError);
-      } finally {
-        // Only redirect if it's a true session expiration
-        toast.error(
-          "Session expired! Caught by interceptor, redirecting to login.",
-        );
-        const timer = setTimeout(() => {
-          window.location.href = "/auth/login";
-        }, 3000);
+        await axiosInstance.get("/auth/refresh");
+        return axiosInstance(originalRequest);
+      } catch (refreshError) {
+        console.error("Token refresh failed:", refreshError);
+        try {
+          await axiosInstance.post("/auth/logout");
+        } catch (logoutError) {
+          console.error("Error during auto-logout:", logoutError);
+        }
+        toast.error("Session expired. Please log in again.");
       }
     }
 
